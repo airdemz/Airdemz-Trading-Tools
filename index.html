@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airdemzz — Check Confirmations</title>
+<style>
+  :root {
+    --primary: #2563eb; /* couleur principale */
+    --bg: #f8fafc;      /* fond page */
+    --text: #0f172a;    /* couleur texte */
+    --card: #ffffff;     /* fond des cartes */
+    --border: #e2e8f0;  /* bordures */
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  h1, h2 {
+    text-align: center;
+    margin-top: 0;
+  }
+  h1 { font-size: 24px; }
+  h2 { color: var(--primary); }
+  p {
+    font-size: 14px;
+    color: #475569;
+    text-align: center;
+  }
+  .input-group {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+  }
+  button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:hover { background: #1d4ed8; }
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  label:hover { background: #f1f5f9; }
+  input[type="checkbox"] { transform: scale(1.3); accent-color: var(--primary); }
+  .counter {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+    color: #475569;
+  }
+  .hidden { display: none; }
+  .validate-btn { margin-top: 20px; width: 100%; }
+  .final { text-align: center; }
+  .final h2 { color: #16a34a; font-size: 24px; }
+  .final p { font-size: 15px; line-height: 1.6; color: #334155; }
+  header { text-align:center; margin-bottom:16px; }
+  header img { width:100px; margin-bottom:8px; }
+</style>
+</head>
+<body>
+
+<!-- CONFIGURATION FACILE -->
+<script>
+  const config = {
+    minConfirmations: 3, // minimum de cases à cocher pour continuer
+    confirmations: [
+      "Structure Daily",
+      "Structure H4",
+      "Structure H1",
+      "0,5 Fibonacci",
+      "0,382 Fibonacci",
+      "0,236 Fibonacci",
+      "Keylevel OB",
+      "Keylevel FVG",
+      "Keylevel Breaker",
+      "Capitulation M15",
+      "Capitulation M5"
+    ],
+    texts: {
+      logoAlt: "Mon Logo",
+      headerTitle: "Zrobase",
+      page1Title: "Confirmations & Indicateurs",
+      page1Desc: "Sélectionne au minimum 3 confirmations avant ton entrée.",
+      page2Title: "Validation visuelle",
+      page2Desc: "Confirmez que chaque indicateur est présent sur votre graphique.",
+      finalTitle: "Trade validé !",
+      finalDesc: "Tu as tes trois confirmations, tu peux donc rentrer dedans.<br>N'oublie pas ton money management et de respecter ton plan et ton système.<br>Finalement, je te souhaite un TP en vert 💚"
+    }
+  }
+</script>
+
+<!-- PAGE 1 -->
+<div class="card" id="page1">
+  <header>
+    <img src="logo.png" alt="" id="logo">
+    <h1 id="headerTitle"></h1>
+  </header>
+
+  <h2 id="page1Title"></h2>
+  <p id="page1Desc"></p>
+
+  <div class="input-group">
+    <input type="text" id="customInput" placeholder="Ajouter confirmation personnelle">
+    <button onclick="addCustom()">Ajouter</button>
+  </div>
+
+  <div id="checklist" class="checklist"></div>
+
+  <div class="counter" id="counter">0 sélectionné (min. 3)</div>
+  <button class="validate-btn" onclick="goToConfirm()" id="nextButton" disabled>Continuer</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="card hidden" id="page2">
+  <h2 id="page2Title"></h2>
+  <p id="page2Desc"></p>
+  <div id="confirmationList" class="checklist"></div>
+  <button class="validate-btn" onclick="finish()">Valider</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="card hidden final" id="page3">
+  <h2 id="finalTitle"></h2>
+  <p id="finalDesc"></p>
+  <button class="validate-btn" onclick="restart()">Nouvelle analyse</button>
+</div>
+
+<script>
+  // --- CONFIGURATION DES TEXTES ET LOGO ---
+  document.getElementById('logo').alt = config.texts.logoAlt;
+  document.getElementById('headerTitle').textContent = config.texts.headerTitle;
+  document.getElementById('page1Title').textContent = config.texts.page1Title;
+  document.getElementById('page1Desc').textContent = config.texts.page1Desc;
+  document.getElementById('page2Title').textContent = config.texts.page2Title;
+  document.getElementById('page2Desc').textContent = config.texts.page2Desc;
+  document.getElementById('finalTitle').innerHTML = config.texts.finalTitle;
+  document.getElementById('finalDesc').innerHTML = config.texts.finalDesc;
+
+  // --- VARIABLES PAGE ---
+  const checklist = document.getElementById('checklist');
+  const counter = document.getElementById('counter');
+  const nextButton = document.getElementById('nextButton');
+  const page1 = document.getElementById('page1');
+  const page2 = document.getElementById('page2');
+  const page3 = document.getElementById('page3');
+  const confirmationList = document.getElementById('confirmationList');
+
+  // --- GENERATION AUTOMATIQUE DES CHECKBOX ---
+  config.confirmations.forEach(item => {
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox"> ${item}`;
+    checklist.appendChild(label);
+  });
+
+  // --- LOGIQUE CHECKBOX ---
+  const updateCount = () => {
+    const checked = checklist.querySelectorAll('input[type="checkbox"]:checked').length;
+    counter.textContent = `${checked} sélectionné${checked>1?'s':''} (min. ${config.minConfirmations})`;
+    counter.style.color = checked >= config.minConfirmations ? "#16a34a" : "#dc2626";
+    nextButton.disabled = checked < config.minConfirmations;
+  };
+  checklist.addEventListener('change', updateCount);
+
+  function addCustom() {
+    const input = document.getElementById('customInput');
+    const value = input.value.trim();
+    if (!value) return;
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox"> ${value}`;
+    checklist.appendChild(label);
+    input.value = '';
+  }
+
+  function goToConfirm() {
+    const checked = [...checklist.querySelectorAll('input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim());
+    confirmationList.innerHTML = "";
+    checked.forEach(item => {
+      const lbl = document.createElement('label');
+      lbl.innerHTML = `<input type="checkbox"> ${item}`;
+      confirmationList.appendChild(lbl);
+    });
+    page1.classList.add('hidden');
+    page2.classList.remove('hidden');
+  }
+
+  function finish() {
+    const allChecked = confirmationList.querySelectorAll('input[type="checkbox"]:checked').length;
+    const total = confirmationList.querySelectorAll('input[type="checkbox"]').length;
+    if (allChecked < total) {
+      alert("Assure-toi d'avoir confirmé chaque indicateur visuellement sur ton graphique.");
+    } else {
+      page2.classList.add('hidden');
+      page3.classList.remove('hidden');
+    }
+  }
+
+  function restart() {
+    location.reload();
+  }
+
+  updateCount();
+</script

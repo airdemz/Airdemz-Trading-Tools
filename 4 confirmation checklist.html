@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airdemzz — Check Confirmations</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --bg: #f8fafc;
+    --text: #0f172a;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  h2 {
+    margin-top: 0;
+    color: var(--primary);
+    text-align: center;
+  }
+  p {
+    font-size: 14px;
+    color: #475569;
+    text-align: center;
+  }
+  .input-group {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+  }
+  button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:hover {
+    background: #1d4ed8;
+  }
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  label:hover {
+    background: #f1f5f9;
+  }
+  input[type="checkbox"] {
+    transform: scale(1.3);
+    accent-color: var(--primary);
+  }
+  .counter {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+    color: #475569;
+  }
+  .hidden {
+    display: none;
+  }
+  .validate-btn {
+    margin-top: 20px;
+    width: 100%;
+  }
+  .final {
+    text-align: center;
+  }
+  .final h2 {
+    color: #16a34a;
+    font-size: 24px;
+  }
+  .final p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #334155;
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="card" id="page1">
+  <h2>Confirmations & Indicateurs</h2>
+  <p>Sélectionne au minimum 4 confirmations avant ton entrée.</p>
+
+  <div class="input-group">
+    <input type="text" id="customInput" placeholder="Ajouter confirmation personnelle">
+    <button onclick="addCustom()">Ajouter</button>
+  </div>
+
+  <div id="checklist" class="checklist">
+    <label><input type="checkbox"> Structure Daily</label>
+    <label><input type="checkbox"> Structure H4</label>
+    <label><input type="checkbox"> Structure H1</label>
+    <label><input type="checkbox"> 0,5 Fibonacci</label>
+    <label><input type="checkbox"> 0,382 Fibonacci</label>
+    <label><input type="checkbox"> 0,236 Fibonacci</label>
+    <label><input type="checkbox"> Keylevel OB</label>
+    <label><input type="checkbox"> Keylevel FVG</label>
+    <label><input type="checkbox"> Keylevel Breaker</label>
+    <label><input type="checkbox"> Turtle Soup M5 - M3🐢</label>
+    <label><input type="checkbox"> Turtle Soup M3 - M1🐢</label>
+  </div>
+
+  <div class="counter" id="counter">0 sélectionné (min. 3)</div>
+  <button class="validate-btn" onclick="goToConfirm()" id="nextButton" disabled>Continuer</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="card hidden" id="page2">
+  <h2>Validation visuelle</h2>
+  <p>Confirmez que chaque indicateur est présent sur votre graphique.</p>
+  <div id="confirmationList" class="checklist"></div>
+  <button class="validate-btn" onclick="finish()">Valider</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="card hidden final" id="page3">
+  <h2>Trade validé !</h2>
+  <p>Il s'agit d'un trade qui rentre dans la méthode.<br><br>
+  Tu as tes trois confirmations, tu peux donc rentrer dedans.<br><br>
+  N'oublie pas ton money management et de respecter ton plan et ton système.<br><br>
+  Finalement, je te souhaite un TP 💚</p>
+  <button class="validate-btn" onclick="restart()">Nouvelle analyse</button>
+</div>
+
+<script>
+const checklist = document.getElementById('checklist');
+const counter = document.getElementById('counter');
+const nextButton = document.getElementById('nextButton');
+const page1 = document.getElementById('page1');
+const page2 = document.getElementById('page2');
+const page3 = document.getElementById('page3');
+const confirmationList = document.getElementById('confirmationList');
+
+const updateCount = () => {
+  const checked = checklist.querySelectorAll('input[type="checkbox"]:checked').length;
+  counter.textContent = `${checked} sélectionné${checked>1?'s':''} (min. 4)`;
+  counter.style.color = checked >= 4 ? "#16a34a" : "#dc2626";
+  nextButton.disabled = checked < 4;
+};
+checklist.addEventListener('change', updateCount);
+
+function addCustom() {
+  const input = document.getElementById('customInput');
+  const value = input.value.trim();
+  if (!value) return;
+  const label = document.createElement('label');
+  label.innerHTML = `<input type="checkbox"> ${value}`;
+  checklist.appendChild(label);
+  input.value = '';
+}
+
+function goToConfirm() {
+  const checked = [...checklist.querySelectorAll('input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim());
+  confirmationList.innerHTML = "";
+  checked.forEach(item => {
+    const lbl = document.createElement('label');
+    lbl.innerHTML = `<input type="checkbox"> ${item}`;
+    confirmationList.appendChild(lbl);
+  });
+  page1.classList.add('hidden');
+  page2.classList.remove('hidden');
+}
+
+function finish() {
+  const allChecked = confirmationList.querySelectorAll('input[type="checkbox"]:checked').length;
+  const total = confirmationList.querySelectorAll('input[type="checkbox"]').length;
+  if (allChecked < total) {
+    alert("Assure-toi d'avoir confirmé chaque indicateur visuellement sur ton graphique.");
+  } else {
+    page2.classList.add('hidden');
+    page3.classList.remove('hidden');
+  }
+}
+
+function restart() {
+  location.reload();
+}
+
+updateCount();
+</script>
+
+</body>
+</html>

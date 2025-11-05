@@ -180,7 +180,7 @@ const confirmationList = document.getElementById('confirmationList');
 
 const updateCount = () => {
   const checked = checklist.querySelectorAll('input[type="checkbox"]:checked').length;
-  counter.textContent = `${checked} sélectionné${checked>1?'s':''} (min. 4)`;
+  counter.textContent = `${checked} sélectionné${checked>1?'s':''} (min. 5)`;
   counter.style.color = checked >= 5 ? "#16a34a" : "#dc2626";
   nextButton.disabled = checked < 5;
 };
